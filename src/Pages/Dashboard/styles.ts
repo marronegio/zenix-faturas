@@ -36,4 +36,10 @@ export const Items = styled.div`
     align-items: center;
     justify-content: center;
     padding: 20px;
+    width: 1000px;
+    max-width: 80%;
+
+    .pagination {
+        margin-top: 20px;
+    }
 `
