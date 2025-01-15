@@ -7,7 +7,7 @@ import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
 export function ListItem(props: any) {
   return (
     <Container>
-      <p>{props.number}</p>
+      <p className="number">{props.number}</p>
       <p>{props.name}</p>
       <p>
         <strong>{props.title}</strong>
@@ -20,7 +20,7 @@ export function ListItem(props: any) {
         <IconButton>
           <EditOutlinedIcon />
         </IconButton>
-        <IconButton>
+        <IconButton onClick={props.deleteFunction}>
           <DeleteOutlineOutlinedIcon />
         </IconButton>
       </div>

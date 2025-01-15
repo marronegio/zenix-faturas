@@ -9,6 +9,11 @@ export const Container = styled.div`
     padding: 10px 24px;
     justify-content: space-between;
 
+    .number {
+        width: 80px;
+        border-right: 1px solid lightgray;
+    }
+
     .data {
         display: flex;
         align-items: center;

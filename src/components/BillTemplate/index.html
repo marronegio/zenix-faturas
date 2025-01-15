@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fatura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .invoice-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 150px;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            margin-bottom: 10px;
+        }
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .details-table th, .details-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .details-table th {
+            background-color: #f0f0f0;
+        }
+        .observations {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Logo -->
+        <div class="logo">
+            <img src="../../assets/logo.png" alt="Logo da Empresa">
+        </div>
+
+        <!-- Título do Serviço -->
+        <div class="title">
+            <h1>Título do Serviço</h1>
+        </div>
+
+        <!-- Descrição do Serviço -->
+        <div class="section">
+            <h3>Descrição do Serviço:</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.</p>
+        </div>
+
+        <!-- Detalhes dos Itens -->
+        <div class="section">
+            <h3>Detalhes dos Itens:</h3>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>Descrição do Item</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Exemplo de item</td>
+                        <td>R$ 100,00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Método de Pagamento e Data de Vencimento -->
+        <div class="section">
+            <h3>Método de Pagamento:</h3>
+            <p>Cartão de Crédito</p>
+
+            <h3>Data de Vencimento:</h3>
+            <p>15/01/2025</p>
+        </div>
+
+        <!-- Valor Total -->
+        <div class="section">
+            <h3>Valor Total:</h3>
+            <p><strong>R$ 100,00</strong></p>
+        </div>
+
+        <!-- Observações -->
+        <div class="section observations">
+            <h3>Observações:</h3>
+            <p>Este é um exemplo de fatura. Todos os valores e informações devem ser revisados antes do envio ao cliente.</p>
+        </div>
+    </div>
+</body>
+</html>

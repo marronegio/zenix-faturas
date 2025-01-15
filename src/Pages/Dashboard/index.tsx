@@ -1,64 +1,57 @@
-import { Button, Pagination } from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { Container, Header, Items } from "./styles";
-import { ListItem } from "../../components/ListItem";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import {
+  Box,
+  createTheme,
+  IconButton,
+  Pagination,
+  Tab,
+  ThemeProvider,
+} from "@mui/material";
+import { Container, Items } from "./styles";
+import { useState } from "react";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import { Link } from "react-router-dom";
+import { Header } from "../../components/Header";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { BillsList } from "../../components/BillsList";
+import { ClientsList } from "../../components/ClientsList";
+import { UsersList } from "../../components/UsersList";
 
 export function Dashboard() {
-  const [bills, setBills] = useState([]);
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 5;
+  const [tabValue, setTabValue] = useState("1");
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/bills")
-      .then((response) => {
-        setBills(response.data);
-        console.log(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, []);
-
-  const displayedBills = bills.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setTabValue(newValue);
+  };
 
   return (
     <>
-      <Header>
-        <h1>Zenix Faturas</h1>
-        <div className="logout-btn">
-          <Button variant="contained" startIcon={<LogoutIcon />}>
-            Sair
-          </Button>
-        </div>
-      </Header>
+      <Header />
       <Container>
-        <Items>
-          {displayedBills.map((bill: any) => (
-            <ListItem
-              key={bill.id}
-              number={bill.id}
-              name={bill.client}
-              title={bill.title}
-              date={bill.date}
-            />
-          ))}
-          <div className="pagination">
-            <Pagination
-              count={Math.ceil(bills.length / itemsPerPage)}
-              color="primary"
-              page={page}
-              onChange={(event, value) => setPage(value)}
-              showFirstButton
-              showLastButton
-            />
+        <Link to="/new-bill">
+          <div className="addBtn">
+            <IconButton color="primary" size="large" onClick={() => {}}>
+              <AddCircleOutlineOutlinedIcon sx={{ fontSize: 40 }} />
+            </IconButton>
           </div>
-        </Items>
+        </Link>
+        <TabContext value={tabValue}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <TabList onChange={handleChange} aria-label="lab API tabs example">
+              <Tab label="Faturas" value="1" />
+              <Tab label="Clientes" value="2" />
+              <Tab label="Usuários" value="3" />
+            </TabList>
+          </Box>
+          <TabPanel value="1">
+            <BillsList />
+          </TabPanel>
+          <TabPanel value="2">
+            <ClientsList />
+          </TabPanel>
+          <TabPanel value="3">
+            <UsersList />
+          </TabPanel>
+        </TabContext>
       </Container>
     </>
   );

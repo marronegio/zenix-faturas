@@ -26,8 +26,21 @@ export const Container = styled.div`
     right: 0;
     bottom: 0;
     display: flex;
+    flex-direction: column; 
     align-items: center;
     justify-content: center;
+
+    .addBtn {
+        position: absolute;
+        right: 50px;
+        bottom: 50px;
+        transition: all 0.2s ease-in-out;
+
+        &:hover {
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+    }
 `
 
 export const Items = styled.div`
@@ -40,6 +53,6 @@ export const Items = styled.div`
     max-width: 80%;
 
     .pagination {
-        margin-top: 20px;
+        margin-top: 40px;
     }
 `

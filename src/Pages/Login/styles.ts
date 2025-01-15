@@ -32,6 +32,10 @@ export const Form = styled.form`
     padding: 0 30px;
     gap: 20px;
 
+    img {
+        width: 200px;
+    }
+
     h1 {
         color: var(--primary);
     }
