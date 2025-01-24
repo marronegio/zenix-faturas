@@ -1,26 +1,36 @@
 import {
   Box,
-  createTheme,
   IconButton,
-  Pagination,
   Tab,
-  ThemeProvider,
 } from "@mui/material";
-import { Container, Items } from "./styles";
-import { useState } from "react";
+import { Container } from "./styles";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
 import { Header } from "../../components/Header";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { BillsList } from "../../components/BillsList";
-import { ClientsList } from "../../components/ClientsList";
-import { UsersList } from "../../components/UsersList";
+import { TabContext, TabList } from "@mui/lab";
 
 export function Dashboard() {
-  const [tabValue, setTabValue] = useState("1");
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const getTabValue = () => {
+    if (location.pathname.includes("/clientes")) return "2";
+    if (location.pathname.includes("/usuarios")) return "3";
+    return "1";
+  };
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setTabValue(newValue);
+    switch (newValue) {
+      case "1":
+        navigate("/dashboard/faturas");
+        break;
+      case "2":
+        navigate("/dashboard/clientes");
+        break;
+      case "3":
+        navigate("/dashboard/usuarios");
+        break;
+    }
   };
 
   return (
@@ -29,12 +39,12 @@ export function Dashboard() {
       <Container>
         <Link to="/new-bill">
           <div className="addBtn">
-            <IconButton color="primary" size="large" onClick={() => {}}>
+            <IconButton color="primary" size="large">
               <AddCircleOutlineOutlinedIcon sx={{ fontSize: 40 }} />
             </IconButton>
           </div>
         </Link>
-        <TabContext value={tabValue}>
+        <TabContext value={getTabValue()}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <TabList onChange={handleChange} aria-label="lab API tabs example">
               <Tab label="Faturas" value="1" />
@@ -42,15 +52,7 @@ export function Dashboard() {
               <Tab label="Usuários" value="3" />
             </TabList>
           </Box>
-          <TabPanel value="1">
-            <BillsList />
-          </TabPanel>
-          <TabPanel value="2">
-            <ClientsList />
-          </TabPanel>
-          <TabPanel value="3">
-            <UsersList />
-          </TabPanel>
+          <Outlet />
         </TabContext>
       </Container>
     </>
