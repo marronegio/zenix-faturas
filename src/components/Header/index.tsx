@@ -1,46 +1,43 @@
-import { Button, Menu, MenuItem } from "@mui/material";
-import { HeaderItem } from "./styles";
-import { useState } from "react";
+import { Sidebar, Logo, NavLinks, LogoutButton } from "./styles";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
+import LogoutIcon from '@mui/icons-material/Logout';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import PeopleIcon from '@mui/icons-material/People';
+import PersonIcon from '@mui/icons-material/Person';
 
 export function Header() {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  const location = useLocation();
+  
+  const isActive = (path: string) => {
+    return location.pathname.includes(path);
   };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+
   return (
-    <HeaderItem>
-      <img src={logo} alt="Zenix Faturas" />
-      <div className="logout-btn">
-        <Button
-          id="basic-button"
-          aria-controls={open ? "basic-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? "true" : undefined}
-          onClick={handleClick}
-          variant="contained"
-        >
-          Menu
-        </Button>
-        <Menu
-          id="basic-menu"
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          MenuListProps={{
-            "aria-labelledby": "basic-button",
-          }}
-        >
-          <MenuItem onClick={handleClose}>Faturas</MenuItem>
-          <MenuItem onClick={handleClose}>Clientes</MenuItem>
-          <MenuItem onClick={handleClose}>Usuários</MenuItem>
-          <MenuItem onClick={handleClose}>Sair</MenuItem>
-        </Menu>
-      </div>
-    </HeaderItem>
+    <Sidebar>
+      <Logo>
+        <img src={logo} alt="Zenix Faturas" />
+      </Logo>
+      
+      <NavLinks>
+        <Link to="/dashboard/faturas" className={isActive('faturas') ? 'active' : ''}>
+          <ReceiptIcon />
+          <span>Faturas</span>
+        </Link>
+        <Link to="/dashboard/clientes" className={isActive('clientes') ? 'active' : ''}>
+          <PeopleIcon />
+          <span>Clientes</span>
+        </Link>
+        <Link to="/dashboard/usuarios" className={isActive('usuarios') ? 'active' : ''}>
+          <PersonIcon />
+          <span>Usuários</span>
+        </Link>
+      </NavLinks>
+
+      <LogoutButton>
+        <LogoutIcon />
+        <span>Sair</span>
+      </LogoutButton>
+    </Sidebar>
   );
 }
