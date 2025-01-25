@@ -15,3 +15,12 @@ export const Button = styled.button`
         background-color:rgb(230, 245, 255);
     }
 `
+
+export const Container = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1rem;
+`;

@@ -27,7 +27,7 @@ export function NewBill() {
     description: "",
     paymentMethod: "",
     dueDate: "",
-    totalAmount: "0",
+    totalAmount: "",
     observations: "",
     items: [{ description: "", value: "" }]
   });
