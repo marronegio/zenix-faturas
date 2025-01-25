@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Container, Form } from './styles';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export function NewUser() {
   const navigate = useNavigate();
@@ -17,24 +18,52 @@ export function NewUser() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (formData.password !== formData.passwordConfirmation) {
       alert('As senhas não coincidem!');
       return;
     }
 
     try {
-      const response = await fetch('https://api.zenixapp.com.br/users', {
-        method: 'POST',
+      // Remove o campo passwordConfirmation antes de enviar para a API
+      const { passwordConfirmation, ...userData } = formData;
+
+      // Pega o token do localStorage
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('Você precisa estar autenticado para realizar esta ação.');
+        navigate('/login');
+        return;
+      }
+
+      const response = await axios.post('https://api.zenixapp.com.br/users', userData, {
         headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
       });
-      if (response.ok) {
+
+      if (response.status === 201) {
         alert('Usuário cadastrado com sucesso!');
         navigate('/dashboard/usuarios');
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          alert('Sua sessão expirou. Por favor, faça login novamente.');
+          navigate('/login');
+        } else {
+          // Erro da API com resposta
+          alert(`Erro ao cadastrar usuário: ${error.response.data.message || 'Tente novamente mais tarde'}`);
+        }
+      } else if (error.request) {
+        // Erro de conexão
+        alert('Erro de conexão. Verifique sua internet e tente novamente.');
+      } else {
+        // Outros erros
+        alert('Erro ao cadastrar usuário. Tente novamente mais tarde.');
+      }
       console.error('Erro ao cadastrar usuário:', error);
     }
   };
