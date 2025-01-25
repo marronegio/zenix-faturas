@@ -3,6 +3,9 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { Items } from "./styles";
 import { ListItem } from "../ListItem";
+import { Link } from "react-router-dom";
+import { AddButton } from "../shared/styles";
+import AddIcon from '@mui/icons-material/Add';
 
 export function BillsList() {
       const [bills, setBills] = useState([]);
@@ -62,6 +65,13 @@ export function BillsList() {
               showLastButton
             />
           </div>
+
+          <AddButton>
+            <Link to="/dashboard/nova-fatura">
+              <AddIcon />
+              <span>Adicionar Fatura</span>
+            </Link>
+          </AddButton>
         </Items>
     )
 }

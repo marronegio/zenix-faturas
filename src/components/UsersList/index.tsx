@@ -3,6 +3,9 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { Items } from "./styles";
 import { ListItem } from "../ListItem";
+import { Link } from "react-router-dom";
+import { AddButton } from "../shared/styles";
+import AddIcon from '@mui/icons-material/Add';
 
 export function UsersList() {
       const [users, setUsers] = useState([]);
@@ -62,6 +65,13 @@ export function UsersList() {
               showLastButton
             />
           </div>
+
+          <AddButton>
+            <Link to="/dashboard/novo-usuario">
+              <AddIcon />
+              <span>Adicionar Usuário</span>
+            </Link>
+          </AddButton>
         </Items>
     )
 }
