@@ -28,38 +28,23 @@ export function NewUser() {
       // Remove o campo passwordConfirmation antes de enviar para a API
       const { passwordConfirmation, ...userData } = formData;
 
-      // Pega o token do localStorage
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        alert('Você precisa estar autenticado para realizar esta ação.');
-        navigate('/login');
-        return;
-      }
-
       const response = await axios.post('https://api.zenixapp.com.br/users', userData, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         }
       });
 
       if (response.status === 201) {
         alert('Usuário cadastrado com sucesso!');
-        navigate('/dashboard/usuarios');
+        navigate('/login');
       }
     } catch (error: any) {
       if (error.response) {
-        if (error.response.status === 401) {
-          alert('Sua sessão expirou. Por favor, faça login novamente.');
-          navigate('/login');
-        } else {
-          // Erro da API com resposta
-          alert(`Erro ao cadastrar usuário: ${error.response.data.message || 'Tente novamente mais tarde'}`);
-        }
+        // Erro da API com resposta
+        alert(`Erro ao cadastrar usuário: ${error.response.data.message || 'Tente novamente mais tarde'}`);
       } else if (error.request) {
         // Erro de conexão
-        alert('Erro de conexão. Verifique sua internet e tente novamente.');
+        alert('Erro de conexão. Verifique sua internet.');
       } else {
         // Outros erros
         alert('Erro ao cadastrar usuário. Tente novamente mais tarde.');

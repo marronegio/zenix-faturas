@@ -7,8 +7,7 @@ import {
   TextField,
 } from "@mui/material";
 import { Form, Grid, ItemsGrid, Page } from "./styles";
-import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "../../components/Header";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -18,76 +17,106 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import { BillItem } from "../../components/BillItem";
-import { deDE } from "@mui/x-date-pickers/locales/deDE";
+import api from '../../services/api';
 
 export function NewBill() {
-  const [description, setDescription] = useState("");
-  const [title, setTitle] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [paymentDate, setPaymentDate] = useState("");
-  const [paymentValue, setPaymentValue] = useState("");
-  const [observations, setObservations] = useState("");
-  const [items, setItems] = useState<{ description: string; value: string }[]>(
-    [{ description: "", value: "" }]
-  );
-
-  let currentId: number;
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    paymentMethod: "",
+    dueDate: "",
+    totalAmount: "0",
+    observations: "",
+    items: [{ description: "", value: "" }]
+  });
 
-  axios
-    .get("http://localhost:3000/bills")
-    .then((response) => {
-      console.log(response.data.length);
-      currentId = response.data.length;
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-
-  async function handleAddBill() {
-    try {
-      await axios.post(`http://localhost:3000/bills`, {
-        id: currentId + 1,
-        title: title,
-        description: description,
-        date: dayjs().format("DD/MM/YYYY"),
-      });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      navigate("/dashboard");
-    }
-  }
+  // Atualiza o valor total automaticamente quando os itens mudam
+  useEffect(() => {
+    const total = formData.items.reduce((sum, item) => {
+      const value = item.value
+        ? parseFloat(item.value.replace('R$', '').replace('.', '').replace(',', '.'))
+        : 0;
+      return sum + value;
+    }, 0);
+    
+    setFormData(prev => ({
+      ...prev,
+      totalAmount: total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    }));
+  }, [formData.items]);
 
   function handleAddNewItem() {
-    setItems((prevItems) => [...prevItems, { description: "", value: "" }]);
+    setFormData(prev => ({
+      ...prev,
+      items: [...prev.items, { description: "", value: "" }]
+    }));
   }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Formata os valores dos itens para números
+      const formattedItems = formData.items.map(item => ({
+        description: item.description,
+        value: parseFloat(item.value.replace('R$', '').replace('.', '').replace(',', '.'))
+      }));
+
+      const invoiceData = {
+        title: formData.title,
+        description: formData.description,
+        paymentMethod: formData.paymentMethod,
+        dueDate: formData.dueDate,
+        totalAmount: parseFloat(formData.totalAmount.replace('.', '').replace(',', '.')),
+        observations: formData.observations,
+        items: formattedItems,
+        status: 'pending'
+      };
+
+      const response = await api.post('/invoices', invoiceData);
+
+      if (response.status === 201) {
+        alert('Fatura criada com sucesso!');
+        navigate('/dashboard/faturas');
+      }
+    } catch (error: any) {
+      if (error.response) {
+        alert(`Erro ao criar fatura: ${error.response.data.message || 'Tente novamente mais tarde'}`);
+      } else if (error.request) {
+        alert('Erro de conexão. Verifique sua internet.');
+      } else {
+        alert('Erro ao criar fatura. Tente novamente mais tarde.');
+      }
+      console.error('Erro ao criar fatura:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Page>
       <Header />
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <h1>Adicionar Nova Fatura</h1>
         <h3>Detalhes do serviço</h3>
         <TextField
           className="form-item"
-          id="title"
           label="Título"
           variant="outlined"
-          onChange={(e) => {
-            const value = e.target.value;
-            setTitle(value);
-          }}
+          required
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
         />
         <TextField
           className="form-item"
-          id="description"
           label="Descrição"
           variant="outlined"
-          onChange={(e) => {
-            const value = e.target.value;
-            setDescription(value);
-          }}
+          required
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
         <div className="line">
           <h3>Itens</h3>
@@ -95,21 +124,24 @@ export function NewBill() {
             <AddCircleOutlineOutlinedIcon sx={{ fontSize: 24 }} />
           </IconButton>
         </div>
-        <ItemsGrid id="items-list">
-          {items.map((item, index) => (
+        <ItemsGrid>
+          {formData.items.map((item, index) => (
             <BillItem
               key={index}
               description={item.description}
               value={item.value}
-              onChange={(updatedItem: any) => {
-                setItems((prevItems) =>
-                  prevItems.map((currentItem, i) =>
-                    i === index ? updatedItem : currentItem
-                  )
-                );
+              onChange={(updatedItem) => {
+                const newItems = [...formData.items];
+                newItems[index] = updatedItem;
+                setFormData({ ...formData, items: newItems });
               }}
               onDelete={() => {
-                setItems((prevItems) => prevItems.filter((_, i) => i !== index));
+                if (formData.items.length > 1) {
+                  setFormData({
+                    ...formData,
+                    items: formData.items.filter((_, i) => i !== index)
+                  });
+                }
               }}
             />
           ))}
@@ -117,60 +149,55 @@ export function NewBill() {
         <h3>Detalhes do pagamento</h3>
         <TextField
           label="Método de Pagamento"
-          id="demo-simple-select"
           select
-          value={paymentMethod}
-          onChange={(e) => {
-            const value = e.target.value;
-            setPaymentMethod(value);
-          }}
+          required
+          value={formData.paymentMethod}
+          onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
         >
           <MenuItem value="PIX">PIX</MenuItem>
-          <MenuItem value="Boleto">Boleto Bancário</MenuItem>
+          <MenuItem value="BOLETO">Boleto Bancário</MenuItem>
         </TextField>
         <Grid>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               label="Data de Vencimento"
               format="DD/MM/YYYY"
-              onChange={(e) => {
-                const value = e;
+              onChange={(value) => {
                 if (value) {
-                  setPaymentDate(dayjs(value).format("DD/MM/YYYY"));
+                  setFormData({
+                    ...formData,
+                    dueDate: dayjs(value).format('YYYY-MM-DD')
+                  });
                 }
               }}
             />
           </LocalizationProvider>
           <NumericFormat
-            value={paymentValue}
-            onChange={(e) => {
-              const value = e.target.value;
-              setPaymentValue(value);
-            }}
+            value={formData.totalAmount}
             customInput={TextField}
             thousandSeparator="."
             prefix="R$"
             label="Valor Total"
             decimalSeparator=","
+            disabled
             allowLeadingZeros={false}
             decimalScale={2}
             fixedDecimalScale={true}
-            allowedDecimalSeparators={[]}
           />
         </Grid>
         <TextField
           label="Observações"
-          id="demo-simple-select"
-          value={observations}
           multiline
           rows={4}
-          onChange={(e) => {
-            const value = e.target.value;
-            setObservations(value);
-          }}
-        ></TextField>
-        <Button variant="contained" onClick={handleAddBill}>
-          ADICIONAR FATURA
+          value={formData.observations}
+          onChange={(e) => setFormData({ ...formData, observations: e.target.value })}
+        />
+        <Button 
+          variant="contained" 
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? 'CRIANDO FATURA...' : 'CRIAR FATURA'}
         </Button>
       </Form>
     </Page>
